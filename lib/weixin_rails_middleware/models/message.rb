@@ -44,6 +44,8 @@ module WeixinRailsMiddleware
         VoiceMessage.new(hash)
       when 'video'
         VideoMessage.new(hash)
+      when 'shortvideo'
+        ShortVideo.new(hash)
       else
         raise ArgumentError, 'Unknown Message'
       end
@@ -160,4 +162,14 @@ module WeixinRailsMiddleware
     end
   end
 
+  class ShortVideo < Message
+
+      def MediaId
+        @source.MediaId
+      end
+
+      def ThumbMediaId
+        @source.ThumbMediaId
+      end
+    end
 end
