@@ -6,7 +6,13 @@ This project rocks and uses MIT-LICENSE.
 
 https://rubygems.org/gems/weixin_rails_middleware
 
-**微信企业版本已经完成，需要的请邮件联系我**
+**已经实现消息体签名及加解密，升级与使用，详见[Wiki 实现消息体签名及加解密](https://github.com/lanrion/weixin_rails_middleware/wiki/msg-encryption-decipher)**
+
+## 微信企业版本
+
+https://github.com/lanrion/qy_wechat
+
+https://github.com/lanrion/qy_wechat_api
 
 ## 使用特别说明
 
@@ -66,12 +72,6 @@ https://github.com/lanrion/weixin_rails_middleware/wiki/gem-users-list
   * 地理位置回复: 自定义需求。
 
   * 其他高级API实现：[weixin_authorize](https://github.com/lanrion/weixin_authorize)
-    * 获取用户管理信息
-    * 分组管理接口
-    * 自定义菜单
-    * 发送客服信息
-    * 生成带参数的二维码
-    * 上传下载多媒体文件
 
 ## 如何测试？
 
@@ -92,6 +92,14 @@ https://github.com/lanrion/weixin_rails_middleware/wiki/gem-users-list
 
  域名为 `http://e0ede89.ngrok.com`。 注意非付费版本域名每次会随机生成，不是固定的。
 
+
+**Ngrok已墙，你懂得的**，ngrok 已墙，请使用localtunnel.me，使用方法：
+
+`npm install -g localtunnel`
+```sh
+$ lt --port 8000
+# your url is: https://gqgh.localtunnel.me
+```
 
 ## 贡献你的代码
 
@@ -114,3 +122,9 @@ https://github.com/lanrion/weixin_rails_middleware/wiki/gem-users-list
 
 ## 参考致谢
   在微信回复信息XML的封装方法，借鉴了 [rack-weixin](https://github.com/wolfg1969/rack-weixin) 实现，特此感谢！
+ 
+## 捐赠支持
+
+  如果你觉得我的gem对你有帮助，欢迎打赏支持，:smile:
+
+  ![](https://raw.githubusercontent.com/lanrion/my_config/master/imagex/donation_me_wx.jpg)
