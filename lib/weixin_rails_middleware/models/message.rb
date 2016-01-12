@@ -177,5 +177,27 @@ module WeixinRailsMiddleware
       @source.ThumbMediaId
     end
   end
-
+  # <xml>
+  #   <ToUserName><![CDATA[toUser]]></ToUserName>
+  #   <FromUserName><![CDATA[fromUser]]></FromUserName>
+  #   <CreateTime>12345678</CreateTime>
+  #   <MsgType><![CDATA[news]]></MsgType>
+  #   <ArticleCount>2</ArticleCount>
+  #   <Articles>
+  #     <item>
+  #       <Title><![CDATA[title1]]></Title>
+  #       <Description><![CDATA[description1]]></Description>
+  #       <PicUrl><![CDATA[picurl]]></PicUrl>
+  #       <Url><![CDATA[url]]></Url>
+  #     </item>
+  #     <item>
+  #       <Title><![CDATA[title]]></Title>
+  #       <Description><![CDATA[description]]></Description>
+  #       <PicUrl><![CDATA[picurl]]></PicUrl>
+  #       <Url><![CDATA[url]]></Url>
+  #     </item>
+  #   </Articles>
+  # </xml>
+  class News < Message
+  end
 end
