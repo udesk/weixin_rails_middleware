@@ -13,6 +13,10 @@ module WeixinRailsMiddleware
     def reply
     end
 
+    # 第三方平台
+    def component_reply
+    end
+
     protected
 
       def initialize_adapter
