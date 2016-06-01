@@ -18,6 +18,7 @@ module WeixinRailsMiddleware
     attr_accessor :public_account_class
     attr_accessor :weixin_secret_string, :weixin_token_string
     attr_accessor :custom_adapter
+    attr_accessor :encoding_aes_key
   end
 
   module ConfigurationHelpers
@@ -44,6 +45,10 @@ module WeixinRailsMiddleware
 
     def custom_adapter
       @custom_adapter ||= WeixinRailsMiddleware.config.custom_adapter.to_s
+    end
+
+    def encoding_aes_key
+      @encoding_aes_key ||= WeixinRailsMiddleware.config.encoding_aes_key.to_s
     end
   end
 end

@@ -1,10 +1,14 @@
 module WeixinRailsMiddleware
   class WeixinController < ActionController::Base
     include ReplyWeixinMessageHelper
+    include ComponentWeixinDecryptHelper
 
     skip_before_filter :verify_authenticity_token
     before_filter :initialize_adapter, :check_weixin_legality, only: [:index, :reply]
-    before_filter :set_weixin_public_account, :set_weixin_message, only: :reply
+    before_filter :set_weixin_public_account, only: [:reply]
+    before_filter :set_weixin_message, only: :reply
+    before_filter :set_weixin_decrypt_message, only: :component_reply
+    before_filter :initialize_adapter, only: [:component_reply]
     before_filter :set_keyword, only: :reply
 
     def index
@@ -50,6 +54,10 @@ module WeixinRailsMiddleware
       # http://apidock.com/rails/ActionController/Base/default_url_options
       def default_url_options(options={})
         { weichat_id: @weixin_message.FromUserName }
+      end
+
+      def set_weixin_decrypt_message
+        @weixin_message ||= Message.factory(decrypt_body(request.body.read))
       end
 
   end

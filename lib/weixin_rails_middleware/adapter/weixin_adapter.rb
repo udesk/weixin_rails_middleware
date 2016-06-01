@@ -4,10 +4,11 @@ module WeixinRailsMiddleware
     extend ConfigurationHelpers
 
     attr_accessor :signature, :timestamp, :nonce, :echostr
-    attr_accessor :weixin_secret_key
+    attr_accessor :weixin_secret_key, :weixin_appid
 
     def initialize(weixin_params)
       @weixin_secret_key = weixin_params[:weixin_secret_key]
+      @weixin_appid = weixin_params[:weixin_appid]
       # 以下参数为什么加空字符串默认值的原因:
       # 微信偶尔会再重新发一次get请求，但是不会带上signature,timestamp,nonce的参数
       # 一个预防措施吧。
