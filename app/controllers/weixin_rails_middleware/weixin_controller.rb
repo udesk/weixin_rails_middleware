@@ -4,11 +4,11 @@ module WeixinRailsMiddleware
     include ComponentWeixinDecryptHelper
 
     skip_before_filter :verify_authenticity_token
+    before_filter :initialize_adapter, only: [:index, :reply, :component_reply]
     before_filter :check_weixin_legality, only: [:index, :reply]
     before_filter :set_weixin_public_account, only: [:reply]
     before_filter :set_weixin_message, only: :reply
     before_filter :set_weixin_decrypt_message, only: :component_reply
-    before_filter :initialize_adapter, only: [:index, :reply, :component_reply]
     before_filter :set_keyword, only: :reply
 
     def index
