@@ -1,5 +1,6 @@
 module WeixinRailsMiddleware
   module ComponentWeixinDecryptHelper
+    extend self
     def decrypt_body(content)
 
       encoding_aes_key = WeixinRailsMiddleware.config.encoding_aes_key
@@ -19,41 +20,45 @@ module WeixinRailsMiddleware
       msg
     end
 
-    def encrypt_body(content, time_stamp, nonce)
-      encoding_aes_key = WeixinRailsMiddleware.config.encoding_aes_key
-      aes_key = Base64.decode64(encoding_aes_key+"=")
-      random = get_random_str.to_s
-      msg_len = msg_length_pack(content).force_encoding("ASCII-8BIT")
-      component_appid = COMPONENT_APPID.to_s
-      aes_msg = random + msg_len.to_s + content.force_encoding("ASCII-8BIT") + component_appid
-      cipher = OpenSSL::Cipher::AES.new(256, :CBC)
-      cipher.encrypt
+    def encrypt_body(aes_key, text, component_appid)
+      text    = text.force_encoding("ASCII-8BIT")
+      random  = SecureRandom.hex(8)
+      msg_len = [text.length].pack("N")
+      text    = "#{random}#{msg_len}#{text}#{component_appid}"
+      text    = ComponentPKCS7Encoder.encode(text)
+      text    = handle_cipher(:encrypt, aes_key, text)
+      Base64.encode64(text)
+    end
+
+    def handle_cipher(action, aes_key, text)
+      cipher = OpenSSL::Cipher.new('AES-256-CBC')
+      cipher.send(action)
+      cipher.padding = 0
       cipher.key     = aes_key
-      cipher.iv      = aes_key[0..16]
-      Rails.logger.debug("#{__method__} aes_msg: #{aes_msg}")
-      decrypted_data = cipher.update(aes_msg) + cipher.final
-      msg_encrypt = Base64.encode64(decrypted_data)
-      sign_str = [TOKEN, time_stamp, nonce, msg_encrypt].sort.join
-      signature = Digest::SHA1.hexdigest(sign_str)
-      res = %Q{<xml><Encrypt><![CDATA[#{msg_encrypt}]]></Encrypt><MsgSignature><![CDATA[#{signature}]]></MsgSignature><TimeStamp>#{time_stamp}</TimeStamp><Nonce><![CDATA[#{nonce}]]></Nonce></xml>}
-      Rails.logger.debug("#{__method__} token/time_stamp/nonce/msg_encrypt/signature ====> #{TOKEN}/#{time_stamp}/#{nonce}/#{msg_encrypt}/#{signature}")
-      Rails.logger.debug("#{__method__} res: #{res}")
-      res
+      cipher.iv      = aes_key[0...16]
+      cipher.update(text) + cipher.final
+    end
+
+    def generate_encrypt_message(token, encrypt_xml)
+      msg = EncryptMessage.new
+      msg.Encrypt = encrypt_xml
+      msg.TimeStamp = Time.now.to_i.to_s
+      msg.Nonce = SecureRandom.hex(8)
+      msg.MsgSignature = generate_msg_signature(token, encrypt_xml, msg)
+      msg.to_xml
+    end
+
+    def generate_msg_signature(token, encrypt_msg, msg)
+      sort_params = [encrypt_msg, token, msg.TimeStamp, msg.Nonce].sort.join
+      Digest::SHA1.hexdigest(sort_params)
     end
 
     def valid_msg_signature(token, time_stamp, nonce, msg_encrypt, msg_signature)
       sign_str = [token, time_stamp, nonce, msg_encrypt].sort.join
       signature = Digest::SHA1.hexdigest(sign_str)
+      Rails.logger.debug("#{__method__} signature/msg_signature: #{signature}/#{msg_signature}")
       return signature == msg_signature
     end
 
-    def get_random_str
-      # 随机生成16位字符串
-      return SecureRandom.hex 16
-    end
-    def msg_length_pack(msg)
-      # 4位网络字节序
-      return [msg.length].pack("N")
-    end
   end
 end
