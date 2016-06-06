@@ -36,7 +36,7 @@ module WeixinRailsMiddleware
       sign_str = [TOKEN, time_stamp, nonce, msg_encrypt].sort.join
       signature = Digest::SHA1.hexdigest(sign_str)
       res = %Q{<xml><Encrypt><![CDATA[#{msg_encrypt}]]></Encrypt><MsgSignature><![CDATA[#{signature}]]></MsgSignature><TimeStamp>#{time_stamp}</TimeStamp><Nonce><![CDATA[#{nonce}]]></Nonce></xml>}
-      Rails.logger.debug("#{__method__} token/time_stamp/nonce/msg_encrypt/signature ====> #{token}/#{time_stamp}/#{nonce}/#{msg_encrypt}/#{signature}")
+      Rails.logger.debug("#{__method__} token/time_stamp/nonce/msg_encrypt/signature ====> #{TOKEN}/#{time_stamp}/#{nonce}/#{msg_encrypt}/#{signature}")
       Rails.logger.debug("#{__method__} res: #{res}")
       res
     end
