@@ -41,6 +41,12 @@ module WeixinRailsMiddleware
       res
     end
 
+    def valid_msg_signature(token, time_stamp, nonce, msg_encrypt, msg_signature)
+      sign_str = [token, time_stamp, nonce, msg_encrypt].sort.join
+      signature = Digest::SHA1.hexdigest(sign_str)
+      return signature == msg_signature
+    end
+
     def get_random_str
       # 随机生成16位字符串
       return SecureRandom.hex 16
