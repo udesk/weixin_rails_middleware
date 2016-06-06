@@ -23,9 +23,9 @@ module WeixinRailsMiddleware
       encoding_aes_key = WeixinRailsMiddleware.config.encoding_aes_key
       aes_key = Base64.decode64(encoding_aes_key+"=")
       random = get_random_str.to_s
-      msg_len = msg_length_pack(content).to_s
+      msg_len = msg_length_pack(content).force_encoding("ASCII-8BIT")
       component_appid = COMPONENT_APPID.to_s
-      aes_msg = random + msg_len.to_s + content.force_encoding("ASCII-8BIT") + content + component_appid
+      aes_msg = random + msg_len.to_s + content.force_encoding("ASCII-8BIT") + component_appid
       cipher = OpenSSL::Cipher::AES.new(256, :CBC)
       cipher.encrypt
       cipher.key     = aes_key
@@ -43,13 +43,11 @@ module WeixinRailsMiddleware
 
     def get_random_str
       # 随机生成16位字符串
-      # return SecureRandom.hex 16
-      return "84751179afb1657d"
+      return SecureRandom.hex 16
     end
     def msg_length_pack(msg)
       # 4位网络字节序
       return [msg.length].pack("N")
-      return '\x00\x00\x011'
     end
   end
 end
