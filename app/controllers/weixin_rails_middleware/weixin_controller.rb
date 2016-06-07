@@ -6,7 +6,7 @@ module WeixinRailsMiddleware
     skip_before_filter :verify_authenticity_token
     before_filter :initialize_adapter, only: [:index, :reply, :component_reply]
     before_filter :check_weixin_legality, only: [:index, :reply]
-    before_filter :set_weixin_public_account, only: [:reply]
+    before_filter :set_weixin_public_account, only: [:reply, :component_reply]
     before_filter :set_weixin_message, only: :reply
     before_filter :set_weixin_decrypt_message, only: :component_reply
     before_filter :set_keyword, only: :reply
@@ -57,7 +57,13 @@ module WeixinRailsMiddleware
       end
 
       def set_weixin_decrypt_message
-        @weixin_message ||= Message.factory(decrypt_body(request.body.read))
+        param_xml = request.body.read
+        Rails.logger.debug("DEBUG WECHAT MESSAGE: #{param_xml}")
+        hash = MultiXml.parse(param_xml)['xml']
+        @body_xml = OpenStruct.new(hash)
+        body_message = decrypt_body(ENCODING_AES_KEY, @body_xml.Encrypt, COMPONENT_APPID)
+        Rails.logger.debug("DEBUG WECHAT BODY_MESSAGE: #{body_message}")
+        @weixin_message ||= Message.factory(body_message[0])
       end
 
   end
