@@ -6,9 +6,9 @@ module WeixinRailsMiddleware
     skip_before_filter :verify_authenticity_token
     before_filter :initialize_adapter, only: [:index, :reply, :component_reply]
     before_filter :check_weixin_legality, only: [:index, :reply]
-    before_filter :set_weixin_public_account, only: [:reply, :component_reply]
     before_filter :set_weixin_message, only: :reply
     before_filter :set_weixin_decrypt_message, only: :component_reply
+    before_filter :set_weixin_public_account, only: [:reply, :component_reply]
     before_filter :set_keyword, only: :reply
 
     def index
@@ -42,7 +42,14 @@ module WeixinRailsMiddleware
 
       def set_weixin_message
         # Get the current weixin message
-        @weixin_message ||= Message.factory(request.body.read)
+        begin
+          @weixin_message ||= Message.factory(request.body.read)
+          event_filter!
+        rescue Exception => e
+          Rails.logger.error "set_weixin_message #{e.to_s}"
+          render text: ''
+          return false
+        end
       end
 
       def set_keyword
@@ -57,13 +64,25 @@ module WeixinRailsMiddleware
       end
 
       def set_weixin_decrypt_message
-        param_xml = request.body.read
-        Rails.logger.debug("DEBUG WECHAT MESSAGE: #{param_xml}")
-        hash = MultiXml.parse(param_xml)['xml']
-        @body_xml = OpenStruct.new(hash)
-        body_message = decrypt_body(ENCODING_AES_KEY, @body_xml.Encrypt, COMPONENT_APPID)
-        Rails.logger.debug("DEBUG WECHAT BODY_MESSAGE: #{body_message}")
-        @weixin_message ||= Message.factory(body_message[0])
+        begin
+          param_xml = request.body.read
+          Rails.logger.debug("DEBUG WECHAT MESSAGE: #{param_xml}")
+          hash = MultiXml.parse(param_xml)['xml']
+          @body_xml = OpenStruct.new(hash)
+          body_message = decrypt_body(ENCODING_AES_KEY, @body_xml.Encrypt, COMPONENT_APPID)
+          Rails.logger.debug("DEBUG WECHAT BODY_MESSAGE: #{body_message}")
+          @weixin_message ||= Message.factory(body_message[0])
+          event_filter!
+        rescue Exception => e
+          Rails.logger.error "set_weixin_decrypt_message #{e.to_s}"
+          render text: ''
+          return false
+        end
+      end
+
+      # return false to stop precess
+      def event_filter!
+        true 
       end
 
   end
