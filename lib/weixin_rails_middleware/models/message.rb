@@ -49,6 +49,7 @@ module WeixinRailsMiddleware
       when 'news'
         News.new(hash)
       else
+        Rails.logger.debug("Unknown Message: #{hash}")
         raise ArgumentError, 'Unknown Message'
       end
     end
