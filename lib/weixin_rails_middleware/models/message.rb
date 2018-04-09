@@ -48,9 +48,10 @@ module WeixinRailsMiddleware
         ShortVideo.new(hash)
       when 'news'
         News.new(hash)
+      when 'file'
+        News.new(hash)
       else
-        Rails.logger.debug("Unknown Message: #{hash}")
-        raise ArgumentError, 'Unknown Message'
+        raise ArgumentError, "Unknown Message: #{hash}"
       end
     end
 
