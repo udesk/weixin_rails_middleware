@@ -50,6 +50,8 @@ module WeixinRailsMiddleware
         News.new(hash)
       when 'file'
         News.new(hash)
+      when 'miniprogrampage'
+        MiniprogramPage.new(hash)
       else
         raise ArgumentError, "Unknown Message: #{hash}"
       end
@@ -199,4 +201,36 @@ module WeixinRailsMiddleware
   # </xml>
   class News < Message
   end
+
+  # <xml>
+  #   <ToUserName><![CDATA[toUser]]></ToUserName>
+  #   <FromUserName><![CDATA[fromUser]]></FromUserName>
+  #   <CreateTime>1482048670</CreateTime>
+  #   <MsgType><![CDATA[miniprogrampage]]></MsgType>
+  #   <MsgId>1234567890123456</MsgId>
+  #   <Title><![CDATA[Title]]></Title>
+  #   <AppId><![CDATA[AppId]]></AppId>
+  #   <PagePath><![CDATA[PagePath]]></PagePath>
+  #   <ThumbUrl><![CDATA[ThumbUrl]]></ThumbUrl>
+  #   <ThumbMediaId><![CDATA[ThumbMediaId]]></ThumbMediaId>
+  # </xml>
+
+  class MiniprogramPage < Message
+    def AppId
+      @source.AppId
+    end
+
+    def PagePath
+      @source.PagePath
+    end
+
+    def ThumbUrl
+      @source.ThumbUrl
+    end
+
+    def ThumbMediaId
+      @source.ThumbMediaId
+    end
+  end
+
 end
