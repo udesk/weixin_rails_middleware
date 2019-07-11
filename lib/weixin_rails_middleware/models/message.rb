@@ -30,7 +30,7 @@ module WeixinRailsMiddleware
     def self.factory(xml)
       hash = MultiXml.parse(xml)['xml']
       case hash['MsgType']
-      when 'text'
+      when 'text', 'rich'
         TextMessage.new(hash)
       when 'image'
         ImageMessage.new(hash)
