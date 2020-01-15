@@ -3,13 +3,14 @@ module WeixinRailsMiddleware
     include ReplyWeixinMessageHelper
     include ComponentWeixinDecryptHelper
 
-    skip_before_filter :verify_authenticity_token
-    before_filter :set_weixin_message, only: :reply
-    before_filter :set_weixin_decrypt_message, only: :component_reply
-    before_filter :initialize_adapter, only: [:index, :reply, :component_reply]
-    before_filter :check_weixin_legality, only: [:index, :reply]
-    before_filter :set_weixin_public_account, only: [:reply, :component_reply]
-    before_filter :set_keyword, only: :reply
+    protect_from_forgery prepend: true
+    skip_before_action :verify_authenticity_token, raise: false
+    before_action :set_weixin_message, only: :reply
+    before_action :set_weixin_decrypt_message, only: :component_reply
+    before_action :initialize_adapter, only: [:index, :reply, :component_reply]
+    before_action :check_weixin_legality, only: [:index, :reply]
+    before_action :set_weixin_public_account, only: [:reply, :component_reply]
+    before_action :set_keyword, only: :reply
 
     def index
     end
